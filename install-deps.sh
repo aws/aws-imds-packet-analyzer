@@ -8,9 +8,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 if ! grep -q "Amazon Linux 2" /etc/os-release; then
-  echo "[ERROR] Only Amazon Linux 2 is support at this time."
-  echo "[ERROR] Other distro support possible, needs bcc and python-bcc"
-  exit 1
+  echo "[ERROR] Only Amazon Linux 2 supported at this time."
+  echo "[ERROR] For other linux flavours you will need to manually install bcc and python-bcc"  exit 1
 fi
 
 # amazon-linux-extras cache uses sudo_user's homedir if called with sudo or /var/cache if directly run as root
