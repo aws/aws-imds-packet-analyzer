@@ -71,7 +71,7 @@ Example of a IMDSv2 log entry:
 The logging configuration can be adjusted by editing the **logging.conf** file.
 
 By default:
-- Logs will be saved to the `/var/logs/` folder in a file called `imds-trace.log`
+- Logs will be saved to the `/var/log/` folder in a file called `imds-trace.log`
 - Log files will be appended (if the analyzer is stopped and then run again on multiple occasions)
 - Each log file will reach a maximum size of 1 megabyte before rollover occurs
 - When a log file reaches 1mb in size it will rollover to a new log file **i.e) imds-trace.log.1 or imds-trace.log.2** 
