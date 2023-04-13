@@ -14,7 +14,7 @@ if ! grep -q "Amazon Linux 2" /etc/os-release; then
 fi
 
 # amazon-linux-extras cache uses sudo_user's homedir if called with sudo or /var/cache if directly run as root
-#  the extras command will fail if user homdir doesn't exist
+#  the extras command will fail if user homedir doesn't exist
 if [ ! -z "${SUDO_USER}" ]; then
   echo "[INFO] Running with sudo..checking if SUDO_USER: '${SUDO_USER}' has home dir to support amazon-linux-extras cache..."
   homedir=$( getent passwd "${SUDO_USER}" | cut -d: -f6 )

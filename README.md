@@ -108,3 +108,11 @@ Permissions for the script may need to be changed:
 ```
 chmod 777 deactivate-tracer-service.sh
 ```
+
+## Limitations
+We are aware of some limitations with the current version of the ImdsPacketAnalyzer.  Contributions are welcomed.
+- The `install-deps.sh` script assumes AL2 and internet connectivity
+- Althought the ImdsPacketAnalyser have been run on multiple distributions, it is only tested on AL2 before new commits are pushed.
+- ImdsPacketAnalyzer only supports IPv4
+- ImdsPacketAnalyzer is intended to be used to identify processes making IMDSv1 calls. There is no guarnatee that it will catch all IMDS calls and it is possible that a network can be configured to route other traffic to the IMDS ip address. The analyzer is reliable enough to be used as a security tool to detect IMDSv1 calls.
+- ImdsPacketAnalyser has not been tested with production traffic in mind, it is intended to be run as a analysis tool to be removed once the source of IMDSv1 calls have been identified. 
