@@ -29,7 +29,7 @@ echo "[Service]" >> $bpf_trace_systemd_path
 echo "Type=simple" >> $bpf_trace_systemd_path
 echo "Restart=always" >> $bpf_trace_systemd_path
 echo "WorkingDirectory=$bpf_trace_path" >> $bpf_trace_systemd_path
-echo "ExecStart=/bin/python3 $bpf_trace_path/src/imds_snoop.py" >> $bpf_trace_systemd_path
+echo "ExecStart=$(command -v python3) $bpf_trace_path/src/imds_snoop.py" >> $bpf_trace_systemd_path
 
 echo "" >> $bpf_trace_systemd_path
 echo "[Install]" >> $bpf_trace_systemd_path

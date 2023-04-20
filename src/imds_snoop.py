@@ -32,6 +32,24 @@ def check_v2(payload: str, is_debug=False) -> bool:
 
     return (is_v2)
 
+"""Remove the token from the message 
+
+:param comms: message that need to be redacted.
+:type: str
+:returns: redacted message
+:rtype: str
+"""
+def hideToken(comms: str) -> str:
+    startToken = comms.find("X-aws-ec2-metadata-token: ") + len("X-aws-ec2-metadata-token: ")
+    endToken = comms.find("==", startToken) + len("==")
+
+    if (startToken >= len("X-aws-ec2-metadata-token: ")) and (endToken > startToken) :
+        newTxt = comms[:startToken] + "**token redacted**" + comms[endToken:]
+    else:
+        newTxt = comms
+
+    return newTxt
+
 
 """ get argv info per calling process
 
@@ -91,7 +109,7 @@ def gen_log_msg(is_v2: bool, event) -> str:
                     str(event.pid[2]) + get_proc_info(event.pid[3],
                                                       event.ggparent_comm.decode()) + ")"
 
-    return (log_msg)
+    return hideToken(log_msg)
 
 
 def print_imds_event(cpu, data, size):
