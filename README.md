@@ -1,3 +1,10 @@
+# Introduction
+
+The AWS ImdsPacketAnalyzer is a tool that traces TCP interactions with the EC2 Instance Metadata Service (IMDS). This can assist in identifying the processes making IMDSv1 calls on a host. Traces contain the `pid`, the `argv` used to launch the process, and the parent `pids` up to four levels deep. This information allow you to identify a Process making IMDSv1 calls for further investigation.
+
+The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://github.com/iovisor/bcc/blob/master/INSTALL.md#Amazon-Linux-2---Binary). In order to successfully run the analyzer the BCC pre-requisites need to be installed.
+
+
 # AWS ImdsPacketAnalyzer
 
 - [Packages - Installing BCC](#packages---installing-bcc)
@@ -26,12 +33,6 @@
 	- [Deactivating the tool as a service](#deactivating-the-tool-as-a-service)
 - [Limitations](#limitations)
 
-
-# Introduction
-
-The AWS ImdsPacketAnalyzer is a tool that traces TCP interactions with the EC2 Instance Metadata Service (IMDS). This can assist in identifying the processes making IMDSv1 calls on a host. Traces contain the `pid`, the `argv` used to launch the process, and the parent `pids` up to four levels deep. This information allow you to identify a Process making IMDSv1 calls for further investigation.
-
-The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://github.com/iovisor/bcc/blob/master/INSTALL.md#Amazon-Linux-2---Binary). In order to successfully run the analyzer the BCC pre-requisites need to be installed.
 
 # Packages - Installing BCC
 For hosts with internet access, the install script can be used. It is advised that this script only be run on non-production instances. Installation will update dependancies and may affect other functionality.
