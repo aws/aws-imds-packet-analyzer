@@ -1,6 +1,6 @@
 # Introduction
 
-The AWS ImdsPacketAnalyzer is a tool that traces TCP interactions with the EC2 Instance Metadata Service (IMDS). This can assist in identifying the processes making IMDSv1 calls on a host. Traces contain the `pid`, the `argv` used to launch the process, and the parent `pids` up to four levels deep. This information allow you to identify a Process making IMDSv1 calls for further investigation.
+The AWS ImdsPacketAnalyzer is a tool that traces TCP interactions with the EC2 Instance Metadata Service (IMDS). This can assist in identifying the processes making IMDSv1 calls on a host. Traces contain the `pid`, the `argv` used to launch the process, and the parent `pids` up to four levels deep. This information allows you to identify a Process making IMDSv1 calls for further investigation.
 
 The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://github.com/iovisor/bcc/blob/master/INSTALL.md#Amazon-Linux-2---Binary). In order to successfully run the analyzer the BCC pre-requisites need to be installed.
 
@@ -35,7 +35,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 
 
 # Packages - Installing BCC
-For hosts with internet access, the install script can be used. It is advised that this script only be run on non-production instances. Installation will update dependancies and may affect other functionality.
+For hosts with internet access, the install script can be used. It is advised that this script is run only on non-production instances. Installation will update dependancies and may affect other functionality.
 For instances without internet access you will need to share the files on an S3 folder.
 ```
 sudo bash install-deps.sh
@@ -92,7 +92,7 @@ Note : During the Dependency installation, the ["libcrypt1"](https://www.mail-ar
 
 ```
 echo deb http://cloudfront.debian.net/debian sid main | sudo tee -a /etc/apt/sources.list
-sudo -i         # Need to switch as root user in the CLI before running below command
+sudo -i         # Need to switch to root user in the CLI before running below command
 apt-get update
 #Set the environment variable DEBIAN_FRONTEND to 'noninteractive' to avoid the prompts and accept the default answers
 export DEBIAN_FRONTEND=noninteractive
@@ -179,7 +179,7 @@ INSTALL METABADGER (https://github.com/salesforce/metabadger)
 ---
 
 ## Usage 
-BCC require that the analyze is run with root permissions. Typically, you can execute the following script and IMDS calls will be logged to the console and to a log file by default (see [logging.conf](logging.conf)).
+BCC requires that the analyzer is run with root permissions. Typically, you can execute the following script and IMDS calls will be logged to the console and to a log file by default (see [logging.conf](logging.conf)).
 ```
 sudo python3 src/imds_snoop.py
 ```
@@ -190,7 +190,7 @@ The following IMDSv1 curl command
 ```
 curl http://169.254.169.254/latest/meta-data/
 ```
-will result the following analyzer output
+will result the following IMDS packet analyzer output
 ```
 IMDSv1(!) (pid:6028:curl argv:curl http://169.254.169.254/latest/meta-data/) called by -> (pid:6027:makeCalls.sh argv:/bin/bash ./makeCalls.sh) -> (pid:4081:zsh argv:-zsh) -> (pid:4081:sshd argv:sshd: kianred@pts/0)
 ```
@@ -250,14 +250,14 @@ sudo python3 src/imds_snoop.py
 
 The output table will highlight if the instance has made IMDSv1 calls
 
-To find the specific app that was making the IMDSv1 calls, use the inbuilt Windows Resource Monitor Network monitor to find the Image and PID of the application making calls.
+To find the specific app making the IMDSv1 calls, use the inbuilt Windows Resource Monitor Network monitor to find the Image and PID of the application making calls.
 
-To do this open Resource Monitor (Start->Search ->Resource Monitor) and click on the Network tab.
+To do this, open Resource Monitor (Start->Search ->Resource Monitor) and click on the Network tab.
 Then look for calls in the Network Activity section made to either the IP or DNS entries listed:
 - IP: ```169.254.169.254```
 - DNS: instance-data.<region>.compute.internal E.g ```instance-data.us-east-1.compute.internal```
 
-Network Analyzer will show the calls and you should proceed to update the software/application
+Network Analyzer will show the calls and you should proceed to update the software/application.
 
 More details and thanks to https://github.com/salesforce/metabadger and https://www.greystone.co.uk/2022/03/24/how-greystone-upgraded-its-aws-ec2-instances-to-use-instance-meta-data-service-version-2-imdsv2/
 
@@ -301,7 +301,7 @@ By default:
 # Running the tool as a service
 
 ## Activating the tool as a service
-Configuring the analyzer to run as a service will ensure that the tool will run as soon as possible even upon the boot up of an instance. This will increase the chances of identifying services making IMDSv1 calls even as early as the instance is inited onto a network. 
+Configuring the analyzer to run as a service will ensure that the tool will run as soon as possible upon the boot up of an instance. This will increase the chances of identifying services making IMDSv1 calls as early as the instance is inited onto a network. 
 
 A shell script has been provided in the package that will automate the process of setting up the analyzer tool as a service. **Note:** the script/service will only work if the structure of the package is left unchanged. 
 
@@ -323,7 +323,7 @@ chmod +x activate-tracer-service.sh
 ```
 
 ## Deactivating the tool as a service
-When the tool is configured as a service using the previous script a service file is added into the OS. In order to restore the system run the script from the command line:
+When the tool is configured as a service using the previous script, a service file is added into the OS. In order to restore the system, run the script from the command line:
 
 ```
 sudo ./deactivate-tracer-service.sh
@@ -347,5 +347,5 @@ We are aware of some limitations with the current version of the ImdsPacketAnaly
 - The `install-deps.sh` script assumes AL2 and internet connectivity
 - Althought the ImdsPacketAnalyser have been run on multiple distributions, it is only tested on AL2 before new commits are pushed.
 - ImdsPacketAnalyzer only supports IPv4
-- ImdsPacketAnalyzer is intended to be used to identify processes making IMDSv1 calls. There is no guarnatee that it will catch all IMDS calls and it is possible that a network can be configured to route other traffic to the IMDS ip address. The analyzer is reliable enough to be used as a security tool to detect IMDSv1 calls.
+- ImdsPacketAnalyzer is intended to be used to identify processes making IMDSv1 calls. There is no guarnatee that it will catch all IMDS calls and it is possible that a network can be configured to route other traffic to the IMDS ip address. The analyzer is reliable enough to be used as a tool to detect IMDSv1 calls.
 - ImdsPacketAnalyser has not been tested with production traffic in mind, it is intended to be run as a analysis tool to be removed once the source of IMDSv1 calls have been identified. 
