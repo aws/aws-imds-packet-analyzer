@@ -3,11 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from bcc import BPF
+import os
 import logging
+from logging.handlers import RotatingFileHandler
 from logging.config import fileConfig
 
-#GLOBAL => set logger object as global because initializing the logger in the bpf callback function could cause unnecessary overhead
-imds_trace_logger = None
+LOGGING_CONFIG_FILE = 'logging.conf'
+LOG_IMDS_FOLDER = "/var/log/imds"
+
+# GLOBAL => set logger object as global because initializing the logger in the bpf callback function could
+# cause unnecessary overhead
+logger = None
 
 """Check if a IMDS call is a imdsV1/2 call
 
@@ -32,6 +38,7 @@ def check_v2(payload: str, is_debug=False) -> bool:
 
     return (is_v2)
 
+
 """Remove the token from the message 
 
 :param comms: message that need to be redacted.
@@ -43,7 +50,7 @@ def hideToken(comms: str) -> str:
     startToken = comms.find("X-aws-ec2-metadata-token: ") + len("X-aws-ec2-metadata-token: ")
     endToken = comms.find("==", startToken) + len("==")
 
-    if (startToken >= len("X-aws-ec2-metadata-token: ")) and (endToken > startToken) :
+    if (startToken >= len("X-aws-ec2-metadata-token: ")) and (endToken > startToken):
         newTxt = comms[:startToken] + "**token redacted**" + comms[endToken:]
     else:
         newTxt = comms
@@ -113,7 +120,8 @@ def gen_log_msg(is_v2: bool, event) -> str:
 
 
 def print_imds_event(cpu, data, size):
-    # let bcc generate the data structure from C declaration automatically given the eBPF event reference (int) -> essentially generates the imds_http_data_t struct in the C code as a bcc.table object
+    # let bcc generate the data structure from C declaration automatically given the eBPF event reference (int) -> essentially
+    # generates the imds_http_data_t struct in the C code as a bcc.table object
     event = b["imds_events"].event(data)
     """event object
   :attribute pid: stores pids of calling processes in the communication chain (4 pids)
@@ -133,49 +141,72 @@ def print_imds_event(cpu, data, size):
   :attribute contains_payload: flag to indicate if the event has a viable payload to analyze or not
   :type contains_payload: int (u32) 
   """
-    #pass whatever data bcc has captured as the event payload to test IMDSv1/2?
+    # pass whatever data bcc has captured as the event payload to test IMDSv1/2?
     is_v2 = check_v2(event.pkt[:event.pkt_size].decode())
-    #generate information string to be logged
+    # generate information string to be logged
     log_msg = gen_log_msg(is_v2, event)
     
     if(event.contains_payload):
-      #log identifiable trace info
+      # log identifiable trace info
       if(is_v2):
-        imds_trace_logger.info(log_msg)
+        logger.info(log_msg)
         print('[INFO] ' + log_msg, end="\n")
       else:
-        imds_trace_logger.warning(log_msg)
+        logger.warning(log_msg)
         print('[WARNING] ' + log_msg, end="\n")
     else:
-      #unidentifiable call -> needs further attention -> hence log at error level
+      # unidentifiable call -> needs further attention -> hence log at error level
       log_msg = "{MISSING PAYLOAD} " + log_msg
-      imds_trace_logger.error(log_msg)
+      logger.error(log_msg)
       print('[ERROR] ' + log_msg, end="\n")
 
 
 if(__name__ == "__main__"):
-  #initialize logger
-  fileConfig('logging.conf')
-  imds_trace_logger = logging.getLogger()
-  
+  if os.geteuid() != 0:
+    exit("You need to have root privileges to run this script.")
+
+  # create and lock down the logging folder, since root is running the trace, only root can view the log
+  if not os.path.exists(LOG_IMDS_FOLDER):
+    os.makedirs(LOG_IMDS_FOLDER)
+
+  st = os.stat(LOG_IMDS_FOLDER)
+  if bool(st.st_mode & 0o00077):
+    print("Setting log folder to root RW access only, permission was: " + str(oct(st.st_mode & 0o00777)))
+    os.chmod(LOG_IMDS_FOLDER, 0o600)  # only user RW needed.
+
+  # initialize logger
+  if os.path.exists(LOGGING_CONFIG_FILE):
+    print("Using config file as one was provided.")
+    fileConfig(LOGGING_CONFIG_FILE)
+    logger = logging.getLogger()
+  else:  # No config file is preferred as we want to ensure the locked down folder is used.
+    print("Logging to /var/log/imds/imds-trace.log")
+    logger = logging.getLogger()
+    c_handler = RotatingFileHandler('/var/log/imds/imds-trace.log', 'a', 1048576, 5, 'UTF-8')
+    c_handler.setLevel(logging.INFO)
+    c_format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
+    c_handler.setFormatter(c_format)
+    logger.addHandler(c_handler)
+
   # initialize BPF
   b = BPF('bpf.c')
-  # Instruments the kernel function event() using kernel dynamic tracing of the function entry, and attaches our C defined function name() to be called when the kernel function is called.
+  # Instruments the kernel function event() using kernel dynamic tracing of the function entry, and attaches our C
+  # defined function name() to be called when the kernel function is called.
   b.attach_kprobe(event="sock_sendmsg", fn_name="trace_sock_sendmsg")
-  # This operates on a table as defined in BPF via BPF_PERF_OUTPUT() [Defined in C code as imds_events, line 32], and associates the callback Python function to be called when data is available in the perf ring buffer.
+  # This operates on a table as defined in BPF via BPF_PERF_OUTPUT() [Defined in C code as imds_events, line 32], and
+  # associates the callback Python function to be called when data is available in the perf ring buffer.
   b["imds_events"].open_perf_buffer(print_imds_event)
 
   # header
-  
   print("Starting ImdsPacketAnalyzer...")
-  print("Currently logging to: " + imds_trace_logger.handlers[0].baseFilename)
   print("Output format: Info Level:[INFO/ERROR...] IMDS version:[IMDSV1/2?] (pid:[pid]:[process name]:argv:[argv]) -> repeats 3 times for parent process")
 
   # filter and format output
   while 1:
     # Read messages from kernel pipe
     try:
-      # This polls from all open perf ring buffers, calling the callback function that was provided when calling open_perf_buffer for each entry.
+      # This polls from all open perf ring buffers, calling the callback function that was provided when calling
+      # open_perf_buffer for each entry.
       b.perf_buffer_poll()
     except ValueError:
       # Ignore messages from other tracers
