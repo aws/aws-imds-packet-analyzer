@@ -145,7 +145,10 @@ def print_imds_event(cpu, data, size):
     is_v2 = check_v2(event.pkt[:event.pkt_size].decode())
     # generate information string to be logged
     log_msg = gen_log_msg(is_v2, event)
-    
+    pkt_size = event.pkt_size
+    payload = event.pkt[:pkt_size].decode()
+    log_msg = log_msg + " Req details: " + ", ".join(payload.splitlines())
+
     if(event.contains_payload):
       # log identifiable trace info
       if(is_v2):
