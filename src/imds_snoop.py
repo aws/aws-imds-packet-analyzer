@@ -103,17 +103,17 @@ def gen_log_msg(is_v2: bool, event) -> str:
         str(event.pid[0]) + get_proc_info(event.pid[0],
                                           event.comm.decode()) + ")"
 
-    if event.parent_comm:
+    if event.parent_comm and event.pid[1]:
         log_msg += " called by -> " + entry_init + \
             str(event.pid[1]) + get_proc_info(event.pid[1],
                                               event.parent_comm.decode()) + ")"
-        if event.gparent_comm:
+        if event.gparent_comm and event.pid[2]:
             log_msg += " -> " + entry_init + \
                 str(event.pid[2]) + get_proc_info(event.pid[2],
                                                   event.gparent_comm.decode()) + ")"
-            if event.ggparent_comm:
+            if event.ggparent_comm and event.pid[3]:
                 log_msg += " -> " + entry_init + \
-                    str(event.pid[2]) + get_proc_info(event.pid[3],
+                    str(event.pid[3]) + get_proc_info(event.pid[3],
                                                       event.ggparent_comm.decode()) + ")"
 
     return hideToken(log_msg)
