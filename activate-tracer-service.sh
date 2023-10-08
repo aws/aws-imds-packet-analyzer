@@ -22,7 +22,6 @@ echo "--- add service details"
 echo "[Unit]" >> $bpf_trace_systemd_path
 echo "Description=ImdsPacketAnalyzer IMDS detection tooling from AWS" >> $bpf_trace_systemd_path
 echo "Before=network-online.target" >> $bpf_trace_systemd_path
-echo "After=multi-user.target" >> $bpf_trace_systemd_path
 echo "" >> $bpf_trace_systemd_path
 
 echo "[Service]" >> $bpf_trace_systemd_path
