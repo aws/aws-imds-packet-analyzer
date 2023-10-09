@@ -1,6 +1,9 @@
 # Changelog
 We do not currently release this software using formal release cycles, the version numbers are best-effort only
 
+## 1.3.0 (2023-10-09)
+- Remove the After dependency on the `multi-user.target` as it is not needed and causes a possible cyclic dependency.
+
 ## 1.2.0 (2023-07-17)
 - Remove logging of zero process_id - resulting in misleading message in log.
 - Fix logging of wrong process id for forth process in process tree.
