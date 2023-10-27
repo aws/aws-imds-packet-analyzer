@@ -17,7 +17,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [RHEL 8 / 9](#rhel-8--9)
 	- [SLES 15](#sles-15)
 	- [Windows](#windows)
-- [Usage](#usage)
+- [Usage](#usage-)
     - [Amazon Linux 2023](#amazon-linux-2023-1)
 	- [Amazon Linux 2](#amazon-linux-2-1)
 	- [Amazon Linux 1](#amazon-linux-1)
@@ -179,7 +179,7 @@ INSTALL METABADGER (https://github.com/salesforce/metabadger)
 ---
 
 ## Usage 
-BCC requires that the analyzer is run with root permissions. Typically, you can execute the following script and IMDS calls will be logged to the console and to a log file by default (see [logging.conf](logging.conf)).
+BCC requires that the analyzer is run with root permissions. Typically, you can execute the following script and IMDS calls will be logged to the console and to a log file by default (see [logging.conf](#log-configuration)).
 ```
 sudo python3 src/imds_snoop.py
 ```
@@ -270,7 +270,7 @@ The ImdsPacketAnalyzer will also capture IMDS calls to log files. Log entries fo
 - **Level:** the level of the log entry, where IMDSv2 calls are logged at `INFO` level and IMDSv1 calls are logged at `WARNING` level
     - If there are any instances where an ImdsPacketAnalyser fail to interpret the packets, `ERROR` level messages will be traced.
     - **Note** The only reason a call cannot be identified is if the analyzer is unable to find a request payload for the IMDS call, this missing payload means the analyzer will not be able to discern V1 from V2 IMDS calls. (see what to do in case of missing payload below).
-    - Errors (due to a *missing payload*) in the log indicate that the analyzer was not able to capture the payload that was sent to the IMDS ip.  Please log a defect with detailed information and consider alternative ways to identify the source of the IMDS call.
+    - Errors (due to a *missing payload*) in the log indicate that the analyzer was not able to capture the payload that was sent to the IMDS ip.  This is expected for AL2 kernel 4.14 on Granite (ARM) instances (see "Limitations" heading below).   If this is a new error case, please log a defect with detailed information and consider alternative ways to identify the source of the IMDS call.
 - **message:** the details of the IMDS call as it would be outputted to the terminal
 
 Example of a IMDSv1 log entry:
@@ -322,6 +322,11 @@ The permissions for the shell script may need to be changed using:
 chmod +x activate-tracer-service.sh
 ```
 
+You can check if the service is running after activating the service or a host reboot:
+```
+systemctl status -l imds_tracer_tool.service
+```
+
 ## Deactivating the tool as a service
 When the tool is configured as a service using the previous script, a service file is added into the OS. In order to restore the system, run the script from the command line:
 
@@ -348,4 +353,5 @@ We are aware of some limitations with the current version of the ImdsPacketAnaly
 - Althought the ImdsPacketAnalyser have been run on multiple distributions, it is only tested on AL2 before new commits are pushed.
 - ImdsPacketAnalyzer only supports IPv4
 - ImdsPacketAnalyzer is intended to be used to identify processes making IMDSv1 calls. There is no guarnatee that it will catch all IMDS calls and it is possible that a network can be configured to route other traffic to the IMDS ip address. The analyzer is reliable enough to be used as a tool to detect IMDSv1 calls.
-- ImdsPacketAnalyser has not been tested with production traffic in mind, it is intended to be run as a analysis tool to be removed once the source of IMDSv1 calls have been identified. 
+- ImdsPacketAnalyser has not been tested with production traffic in mind, it is intended to be run as a analysis tool to be removed once the source of IMDSv1 calls have been identified.
+- AL2 kernel 4.14 on Graviton (ARM) lack the eBPF features required to determine if a call is IMDSv1 or V2.  This is reported as `{MISSING PAYLOAD}` error.  We do not have a workaround for this and do not have a planned fix.
