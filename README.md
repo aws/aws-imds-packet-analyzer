@@ -287,7 +287,7 @@ Example of a IMDSv2 log entry:
 The logging configuration can be adjusted by editing the **logging.conf** file.
 
 By default:
-- Logs will be saved to the `/var/log/` folder in a file called `imds-trace.log`
+- Logs will be saved to the `/var/log/imds/` folder in a file called `imds-trace.log`
 - Log files will be appended (if the analyzer is stopped and then run again on multiple occasions)
 - Each log file will reach a maximum size of 1 megabyte before rollover occurs
 - When a log file reaches 1mb in size it will rollover to a new log file **i.e) imds-trace.log.1 or imds-trace.log.2** 
@@ -295,7 +295,7 @@ By default:
 
 ### Analyzing log files
 **Assuming default logging setup:** 
-- Running the command `cat /var/log/imds-trace.* | grep WARNING` will output all IMDSv1 calls to the terminal. 
+- Running the command `cat /var/log/imds/imds-trace.* | grep WARNING` will output all IMDSv1 calls to the terminal. 
 - Note that this grep will only identify the call, sometimes the calls leading up to the V1 call can provide additional context.   
 
 # Running the tool as a service
