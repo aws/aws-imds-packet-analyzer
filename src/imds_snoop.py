@@ -195,7 +195,14 @@ if(__name__ == "__main__"):
   b = BPF('bpf.c')
   # Instruments the kernel function event() using kernel dynamic tracing of the function entry, and attaches our C
   # defined function name() to be called when the kernel function is called.
-  b.attach_kprobe(event="sock_sendmsg", fn_name="trace_sock_sendmsg")
+  #
+  # kernel update https://github.com/torvalds/linux/commit/81d03e2518945c4bc7b9a7b3f1935203954bf3ba cause the event to not fire, using previous implementation now in `__sock_sendmsg`
+  try:
+    b.attach_kprobe(event="__sock_sendmsg", fn_name="trace_sock_sendmsg")
+  except:
+    logger.info("Failed to attach kprobe to __sock_sendmsg, using older kernel implementation")
+    b.attach_kprobe(event="sock_sendmsg", fn_name="trace_sock_sendmsg")
+
   # This operates on a table as defined in BPF via BPF_PERF_OUTPUT() [Defined in C code as imds_events, line 32], and
   # associates the callback Python function to be called when data is available in the perf ring buffer.
   b["imds_events"].open_perf_buffer(print_imds_event)
