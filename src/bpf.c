@@ -44,8 +44,18 @@ int trace_sock_sendmsg(struct pt_regs *ctx)
         if (!data) // this should never happen, just making the verifier happy
           return 0;
 
+        #if defined(iter_iov) || defined (iter_iov_len)
+        const struct iovec * iov = msghdr->msg_iter.__iov;
+        #else
         const struct iovec * iov = msghdr->msg_iter.iov;
-        void *iovbase = iov->iov_base;
+        #endif
+        const void *iovbase;
+        if (*(char *)iov->iov_base == '\0'){
+          iovbase = iov;
+        }
+        else{
+          iovbase = iov->iov_base;
+        }
         const size_t iovlen = iov->iov_len > MAX_PKT ? MAX_PKT : iov->iov_len;
         
         if (!iovlen) {
