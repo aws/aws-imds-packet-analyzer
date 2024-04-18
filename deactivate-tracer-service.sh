@@ -24,4 +24,4 @@ echo ""
 
 echo "[INFO] Associated log files can be found in the /var/log/ directory"
 echo "Run the following command to delete all log files: "
-echo "sudo rm /var/log/imds-trace.*"
+echo "sudo rm /var/log/imds/imds-trace.*"

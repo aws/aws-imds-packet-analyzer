@@ -14,7 +14,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Debian 11](#debian-11)
 	- [Debian 10](#debian-10)
 	- [Ubuntu 20 / 22](#ubuntu-20--22)
-	- [RHEL 8 / 9](#rhel-8--9)
+	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora)
 	- [SLES 15](#sles-15)
 	- [Windows](#windows)
 - [Usage](#usage-)
@@ -24,7 +24,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Debian 11](#debian-11-1)
 	- [Debian 10](#debian-10-1)
 	- [Ubuntu 20 / 22](#ubuntu-20--22-1)
-	- [RHEL 8 / 9](#rhel-8--9-1)
+	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora-1)
 	- [SLES 15](#sles-15-1)
 	- [Windows](#windows-1)
 - [Logging](#logging)
@@ -127,7 +127,7 @@ sudo apt-get install linux-headers-$(uname -r)
 ```
 ---
 
-## RHEL 8 / 9
+## RHEL 8 / 9 / Fedora
 
 ```
 sudo yum -y install bcc-tools libbpf
@@ -232,7 +232,7 @@ sudo LD_PRELOAD=/home/ubuntu/bcc/build/src/cc/libbcc.so.0 PYTHONPATH=/home/ubunt
 ```
 ---
 
-## RHEL 8 / 9
+## RHEL 8 / 9 / Fedora
 ```
 sudo python3 src/imds_snoop.py
 ```
