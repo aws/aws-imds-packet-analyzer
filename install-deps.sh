@@ -123,6 +123,9 @@ elif grep -q 'ID=ubuntu' /etc/os-release  &&  grep -q 'VERSION_ID="20.04"' /etc/
 elif grep -q 'ID="rhel"' /etc/os-release; then
     #RHEL 8 and 9
     yum -y install bcc-tools libbpf
+elif grep -q 'ID=fedora' /etc/os-release; then
+    #Fedora
+    yum -y install bcc-tools libbpf
 elif grep -q 'ID="sles"' /etc/os-release  && grep -q 'VERSION_ID="15.[0-4]"' /etc/os-release ; then
     #SLES 15
     zypper ref
