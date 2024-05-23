@@ -131,6 +131,9 @@ elif grep -q 'ID="sles"' /etc/os-release  && grep -q 'VERSION_ID="15.[0-4]"' /et
     zypper ref
     zypper in -y  bcc-tools bcc-examples
     zypper in -y --oldpackage kernel-default-devel-$(zypper se -s kernel-default-devel | awk '{split($0,a,"|"); print a[4]}' | grep $(uname -r | awk '{gsub("-default", "");print}') | sed -e 's/^[ \t]*//' | tail -n 1)
+elif grep -q "CentOS Stream" /etc/os-release; then
+    #CentOS
+    yum -y install bcc
 else
     echo "[ERROR] Unsupported operating system"
     exit 1
