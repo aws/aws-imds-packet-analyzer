@@ -16,6 +16,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Ubuntu 20 / 22](#ubuntu-20--22)
 	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora)
 	- [SLES 15](#sles-15)
+	- [CentOS 9](#centos9)
 	- [Windows](#windows)
 - [Usage](#usage-)
     - [Amazon Linux 2023](#amazon-linux-2023-1)
@@ -26,6 +27,7 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Ubuntu 20 / 22](#ubuntu-20--22-1)
 	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora-1)
 	- [SLES 15](#sles-15-1)
+	- [CentOS 9](#centos9-1)
 	- [Windows](#windows-1)
 - [Logging](#logging)
 - [Running the tool as a service](#running-the-tool-as-a-service)
@@ -143,6 +145,13 @@ sudo zypper in --oldpackage kernel-default-devel-$(zypper se -s kernel-default-d
 
 ---
 
+## CentOS 9
+```
+sudo yum -y install bcc
+```
+
+---
+
 ## WINDOWS
 
 INSTALL PYTHON
@@ -241,6 +250,12 @@ sudo python3 src/imds_snoop.py
 ## SLES 15
 ```
 sudo python3 src/imds_snoop.py
+```
+---
+
+## CentOS 9
+```
+sudo python src/imds_snoop.py
 ```
 ---
 
