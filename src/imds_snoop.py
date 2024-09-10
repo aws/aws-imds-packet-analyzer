@@ -47,7 +47,7 @@ def check_v2(payload: str, is_debug=False) -> bool:
 :rtype: str
 """
 def hideToken(comms: str) -> str:
-    startToken = comms.find("X-aws-ec2-metadata-token: ") + len("X-aws-ec2-metadata-token: ")
+    startToken = comms.find("X-aws-ec2-metadata-token: ")
     endToken = comms.find("==", startToken) + len("==")
 
     if (startToken >= len("X-aws-ec2-metadata-token: ")) and (endToken > startToken):
@@ -57,6 +57,12 @@ def hideToken(comms: str) -> str:
 
     return newTxt
 
+def recurseHideToken(comms: str) -> str:
+    newTxt = comms
+    while newTxt.find("X-aws-ec2-metadata-token: ") >= 0:
+        newTxt = hideToken(newTxt)
+
+    return newTxt
 
 """ get argv info per calling process
 
@@ -116,7 +122,7 @@ def gen_log_msg(is_v2: bool, event) -> str:
                     str(event.pid[3]) + get_proc_info(event.pid[3],
                                                       event.ggparent_comm.decode()) + ")"
 
-    return hideToken(log_msg)
+    return log_msg
 
 
 def print_imds_event(cpu, data, size):
@@ -148,6 +154,7 @@ def print_imds_event(cpu, data, size):
     pkt_size = event.pkt_size
     payload = event.pkt[:pkt_size].decode()
     log_msg = log_msg + " Req details: " + ", ".join(payload.splitlines())
+    log_msg = recurseHideToken(log_msg)
 
     if(event.contains_payload):
       # log identifiable trace info

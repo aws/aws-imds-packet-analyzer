@@ -1,6 +1,9 @@
 # Changelog
 We do not currently release this software using formal release cycles, the version numbers are best-effort only
 
+## 1.4.0 (2024-09-10)
+- Change to redact tokens from the log messages as tokens were logged as a result of adding the headers.  Log file (and folder) has always been accessible only by root user.  
+
 ## 1.3.0 (2023-10-09)
 - Remove the After dependency on the `multi-user.target` as it is not needed and causes a possible cyclic dependency.
 
