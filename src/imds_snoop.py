@@ -8,6 +8,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 from logging.config import fileConfig
 
+EC_METADATA_TOKEN_ = "x-aws-ec2-metadata-token:"
+
 LOGGING_CONFIG_FILE = 'logging.conf'
 LOG_IMDS_FOLDER = "/var/log/imds"
 
@@ -47,10 +49,10 @@ def check_v2(payload: str, is_debug=False) -> bool:
 :rtype: str
 """
 def hideToken(comms: str) -> str:
-    startToken = comms.find("X-aws-ec2-metadata-token: ")
+    startToken = comms.find(EC_METADATA_TOKEN_)
     endToken = comms.find("==", startToken) + len("==")
 
-    if (startToken >= len("X-aws-ec2-metadata-token: ")) and (endToken > startToken):
+    if (startToken >= len(EC_METADATA_TOKEN_)) and (endToken > startToken):
         newTxt = comms[:startToken] + "**token redacted**" + comms[endToken:]
     else:
         newTxt = comms
@@ -58,8 +60,8 @@ def hideToken(comms: str) -> str:
     return newTxt
 
 def recurseHideToken(comms: str) -> str:
-    newTxt = comms
-    while newTxt.find("X-aws-ec2-metadata-token: ") >= 0:
+    newTxt = comms.lower()
+    while newTxt.find(EC_METADATA_TOKEN_) >= 0:
         newTxt = hideToken(newTxt)
 
     return newTxt
