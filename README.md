@@ -113,8 +113,16 @@ apt-get install -y bpfcc-tools libbpfcc libbpfcc-dev linux-headers-$(uname -r) b
 ---
 
 ## Ubuntu 20 / 22
+For Ubuntu 20 -
+```
+sudo apt install -y bison build-essential cmake flex git libedit-dev libllvm12 llvm-12-dev libclang-12-dev python zlib1g-dev libelf-dev libfl-dev python3-distutils zip
+```
+For Ubuntu 22 -
 ```
 sudo apt install -y bison build-essential cmake flex git libedit-dev libllvm14 llvm-14-dev libclang-14-dev python3 zlib1g-dev libelf-dev libfl-dev python3-distutils zip
+```
+
+```
 git clone https://github.com/iovisor/bcc.git
 mkdir bcc/build; cd bcc/build
 cmake ..
