@@ -2,49 +2,52 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-#check if shell script is running as root => su permissions to edit /etc/systemd/system dir
-if [ "$EUID" -ne 0 ]; then
-  echo "[ERROR] Please run as root (sudo)"
-  exit 1
+set -e  # Exit immediately if a command exits with a non-zero status
+
+BPF_TRACE_SERVICE="imds_tracer_tool.service"
+BPF_TRACE_PATH=$(pwd)
+BPF_TRACE_SYSTEMD_PATH="/etc/systemd/system/$BPF_TRACE_SERVICE"
+
+# Check if script is running as root
+if [[ $EUID -ne 0 ]]; then
+    echo "[ERROR] Please run as root (sudo)" >&2
+    exit 1
 fi
 
-bpf_trace_service="imds_tracer_tool.service"
-bpf_trace_path=$(pwd)
-bpf_trace_systemd_path="/etc/systemd/system/$bpf_trace_service"
+# Function to create service file
+create_service_file() {
+    cat << EOF > "$BPF_TRACE_SYSTEMD_PATH"
+[Unit]
+Description=ImdsPacketAnalyzer IMDS detection tooling from AWS
+Before=network-online.target
 
-echo "--- removing old service file"
-rm $bpf_trace_systemd_path
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=$BPF_TRACE_PATH
+ExecStart=$(command -v python3) $BPF_TRACE_PATH/src/imds_snoop.py
 
-echo "--- create new Unit file"
-touch $bpf_trace_systemd_path
+[Install]
+WantedBy=multi-user.target
+EOF
+}
 
-echo "--- add service details"
-echo "[Unit]" >> $bpf_trace_systemd_path
-echo "Description=ImdsPacketAnalyzer IMDS detection tooling from AWS" >> $bpf_trace_systemd_path
-echo "Before=network-online.target" >> $bpf_trace_systemd_path
-echo "" >> $bpf_trace_systemd_path
+# Main script execution
+echo "--- Removing old service file"
+rm -f "$BPF_TRACE_SYSTEMD_PATH"
 
-echo "[Service]" >> $bpf_trace_systemd_path
-echo "Type=simple" >> $bpf_trace_systemd_path
-echo "Restart=always" >> $bpf_trace_systemd_path
-echo "WorkingDirectory=$bpf_trace_path" >> $bpf_trace_systemd_path
-echo "ExecStart=$(command -v python3) $bpf_trace_path/src/imds_snoop.py" >> $bpf_trace_systemd_path
-
-echo "" >> $bpf_trace_systemd_path
-echo "[Install]" >> $bpf_trace_systemd_path
-echo "WantedBy=multi-user.target" >> $bpf_trace_systemd_path
+echo "--- Creating new service file"
+create_service_file
 
 echo "--- Service details:"
-echo ""
-cat $bpf_trace_systemd_path
+cat "$BPF_TRACE_SYSTEMD_PATH"
 
-echo ""
-echo "--- reload daemon and enable the $bpf_trace_service service"
+echo
+echo "--- Reloading daemon and enabling the $BPF_TRACE_SERVICE service"
 systemctl daemon-reload
-systemctl enable $bpf_trace_service
+systemctl enable "$BPF_TRACE_SERVICE"
 
-echo "--- start the $bpf_trace_service service"
-# For normal service we would start in activate, but we're starting here as we want to detect all IMDSv1 calls as early as possible
-systemctl start $bpf_trace_service
+echo "--- Starting the $BPF_TRACE_SERVICE service"
+systemctl start "$BPF_TRACE_SERVICE"
 
-echo "--- done"
+echo "--- Done"
