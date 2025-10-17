@@ -1,6 +1,10 @@
 # Changelog
 We do not currently release this software using formal release cycles, the version numbers are best-effort only
 
+## 1.5.0 (2025-10-17)
+- Fix BPF compilation errors on AL2023 kernel 6.12+ by adding forward declarations for incomplete BPF structs
+- Fix IMDSv2 calls not being written to log files by correcting logger level configuration
+
 ## 1.4.0 (2024-09-10)
 - Change to redact tokens from the log messages as tokens were logged as a result of adding the headers.  Log file (and folder) has always been accessible only by root user.  
 

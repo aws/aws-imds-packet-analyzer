@@ -195,7 +195,7 @@ if(__name__ == "__main__"):
     print("Logging to /var/log/imds/imds-trace.log")
     logger = logging.getLogger()
     c_handler = RotatingFileHandler('/var/log/imds/imds-trace.log', 'a', 1048576, 5, 'UTF-8')
-    c_handler.setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     c_format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
     c_handler.setFormatter(c_format)
     logger.addHandler(c_handler)

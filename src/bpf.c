@@ -1,10 +1,22 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wduplicate-decl-specifier"  // for now we acknowledge the kernel 6.12+ warnings
+
 #include <uapi/linux/ptrace.h>
-#include <net/sock.h>
 #include <bcc/proto.h>
 #include <linux/sched.h>
+
+// Forward declarations to fix kernel 6.12+ compatibility
+struct bpf_wq {};
+struct bpf_rb_root {};
+struct bpf_rb_node {};
+struct bpf_refcount {};
+
+#include <net/sock.h>
+
+#pragma clang diagnostic pop
 
 #define IP_169_254_169_254 0xFEA9FEA9
 
