@@ -13,7 +13,8 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Amazon Linux 1, 2018.03](#amazon-linux-1-201803)
 	- [Debian 11](#debian-11)
 	- [Debian 10](#debian-10)
-	- [Ubuntu 20 / 22](#ubuntu-20--22)
+	- [Ubuntu 20](#ubuntu-20)
+	- [Ubuntu 22](#ubuntu-22)
 	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora)
 	- [SLES 15](#sles-15)
 	- [CentOS 9](#centos9)
@@ -24,7 +25,8 @@ The ImdsPacketAnalyzer leverages the [BCC (BPF Compiler Collection)](https://git
 	- [Amazon Linux 1](#amazon-linux-1)
 	- [Debian 11](#debian-11-1)
 	- [Debian 10](#debian-10-1)
-	- [Ubuntu 20 / 22](#ubuntu-20--22-1)
+	- [Ubuntu 20](#ubuntu-20-1)
+	- [Ubuntu 22](#ubuntu-22-1)
 	- [RHEL 8 / 9 / Fedora](#rhel-8--9--fedora-1)
 	- [SLES 15](#sles-15-1)
 	- [CentOS 9](#centos9-1)
@@ -112,14 +114,10 @@ apt-get install -y bpfcc-tools libbpfcc libbpfcc-dev linux-headers-$(uname -r) b
 ```
 ---
 
-## Ubuntu 20 / 22
-For Ubuntu 20 -
+## Ubuntu 20
+
 ```
 sudo apt install -y bison build-essential cmake flex git libedit-dev libllvm12 llvm-12-dev libclang-12-dev python zlib1g-dev libelf-dev libfl-dev python3-distutils zip
-```
-For Ubuntu 22 -
-```
-sudo apt install -y bison build-essential cmake flex git libedit-dev libllvm14 llvm-14-dev libclang-14-dev python3 zlib1g-dev libelf-dev libfl-dev python3-distutils zip
 ```
 
 ```
@@ -134,6 +132,13 @@ make
 sudo make install
 popd
 sudo apt-get install linux-headers-$(uname -r)
+```
+---
+
+## Ubuntu 22
+
+```
+sudo apt install -y bpfcc-tools
 ```
 ---
 
@@ -243,11 +248,16 @@ sudo python3 src/imds_snoop.py
 ```
 ---
 
-## Ubuntu 20 / 22
+## Ubuntu 20
 ```
 sudo LD_PRELOAD=/home/ubuntu/bcc/build/src/cc/libbcc.so.0 PYTHONPATH=/home/ubuntu/bcc/build/src/python src/imds_snoop.py
 ```
 ---
+
+## Ubuntu 22
+```
+sudo sudo python3 src/imds_snoop.py
+```
 
 ## RHEL 8 / 9 / Fedora
 ```
